@@ -236,6 +236,7 @@ public class FileAccountLinkManager extends AbstractAccountLinkManager {
             linkedAccounts.put(discordId, uuid);
         }
         afterLink(discordId, uuid);
+        this.save();
     }
 
     @Override
@@ -252,6 +253,7 @@ public class FileAccountLinkManager extends AbstractAccountLinkManager {
         }
 
         afterUnlink(uuid, discordId);
+        this.save();
     }
 
     @Override
@@ -267,6 +269,7 @@ public class FileAccountLinkManager extends AbstractAccountLinkManager {
             linkedAccounts.remove(discordId);
         }
         afterUnlink(uuid, discordId);
+        this.save();
     }
 
     @Override

@@ -16,4 +16,4 @@ Compile DiscordSRV Steps:
 14- Change Maven home path to apache-maven-3.8.4
 15- Search for Compiler then Java Compiler, if there is no module, click + module, choose discordsrv module with bytecode 17, click apply.
 16- Refresh Maven tab, collapse DiscordSRV and collapse Lifecycle and search for install and click on it.
-17- Compiled Jar File will be in your DiscordSRV-master source directory (compile1), DiscordSRV-Build-1.24.0-null.jar
+17- Compiled Jar File will be in (DiscordSRV-master/target) directory , DiscordSRV-Build-1.24.0-null.jar

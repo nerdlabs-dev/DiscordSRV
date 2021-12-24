@@ -1,0 +1,19 @@
+Compile DiscordSRV Steps:
+
+1- Download DiscordSRV sources from github, https://github.com/DiscordSRV/DiscordSRV/archive/refs/heads/master.zip (1.24)
+2- Unzip into a directory, DiscordSRV-master
+3- Download IntelliJ Java Ide , free community edition, https://www.jetbrains.com/fr-fr/idea/download/download-thanks.html?platform=windows&code=IIC 
+4- Install Intelli J
+5- Download Maven 3.8.4, https://dlcdn.apache.org/maven/maven-3/3.8.4/binaries/apache-maven-3.8.4-bin.zip
+6- Unzip maven into apache-maven-3.8.4 directory
+7- Download Latest Java, https://download.oracle.com/java/17/latest/jdk-17_windows-x64_bin.zip
+8- Unzip java into jdk-17.0.1 directory
+9- Update your java https://www.java.com/en/download/
+10- Open intelliJ
+11- Click on open and select pom.xlm file inside DiscordSRV-master dir, then trust and open as a project.
+12- Click on file, project structure, Choose a SDK, choose jdk-17.0.1 directory
+13- Check on Maven tab and click last icon that is named (Build tool settings) and click on maven settings
+14- Change Maven home path to apache-maven-3.8.4
+15- Search for Compiler then Java Compiler, if there is no module, click + module, choose discordsrv module with bytecode 17, click apply.
+16- Refresh Maven tab, collapse DiscordSRV and collapse Lifecycle and search for install and click on it.
+17- Compiled Jar File will be in your DiscordSRV-master source directory (compile1), DiscordSRV-Build-1.24.0-null.jar

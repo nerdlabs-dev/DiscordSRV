@@ -37,9 +37,6 @@ jobs:
           git config --local user.name "GitHub"
           git commit -m "Release $VERSION" -a
       - name: Build & deploy to Nexus
-        env:
-          NEXUS_USER: ci
-          NEXUS_PASS: ${{ secrets.NEXUS_CI }}
         run: mvn --batch-mode --update-snapshots --settings deploy.xml deploy
       - name: Push to master
         uses: ad-m/github-push-action@master

@@ -16,7 +16,7 @@ jobs:
         java-version: 1.8
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-    - name: copy file via ssh key
-      uses: appleboy/scp-action@master
+    - name: list
+      run: ls -a
 
     

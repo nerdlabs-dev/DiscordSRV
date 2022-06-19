@@ -35,8 +35,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./target/DiscordSRV-Build-1.25.1-${{GITHUB_SHA::8}}.jar
-          asset_name: DiscordSRV-Build-1.25.1-${{GITHUB_SHA::8}}.jar
+          run: echo ${{steps.create_release.outputs}}
+          asset_path: ./target/DiscordSRV-Build-1.25.1-${{steps.create_release.outputs.sha}}.jar
+          asset_name: DiscordSRV-Build-1.25.1-${{steps.create_release.outputs.sha}}.jar
           asset_content_type: application/zip
 
     

@@ -45,6 +45,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -80,7 +81,7 @@ public class MessageUtil {
      * Pattern for capturing both ampersand and the legacy section sign color codes.
      * @see #LEGACY_SECTION
      */
-    public static final Pattern STRIP_PATTERN = Pattern.compile("(?<!<@)[&§](?i)[0-9a-fklmnorx]");
+    public static final Pattern STRIP_PATTERN = Pattern.compile("(?<!<@)[&§\u007F](?i)[0-9a-fklmnorx]");
 
     /**
      * Pattern for capturing section sign color codes.
@@ -339,9 +340,26 @@ public class MessageUtil {
      */
     public static void sendMessage(Iterable<? extends CommandSender> commandSenders, Component adventureMessage) {
         Set<Audience> audiences = new HashSet<>();
-        commandSenders.forEach(sender -> audiences.add(getAudiences().sender(sender)));
+        Set<Audience> degradedAudiences = new HashSet<>();
+        commandSenders.forEach(sender -> {
+            Audience audience = getAudiences().sender(sender);
+            if (sender instanceof Player && DiscordSRV.getPlugin().getIncompatibleClientManager().isIncompatible((Player) sender)) {
+                degradedAudiences.add(audience);
+            } else {
+                audiences.add(audience);
+            }
+        });
+
         try {
-            Audience.audience(audiences).sendMessage(Identity.nil(), adventureMessage);
+            if (!audiences.isEmpty()) {
+                Audience.audience(audiences).sendMessage(Identity.nil(), adventureMessage);
+            }
+
+            if (!degradedAudiences.isEmpty()) {
+                // Put it through legacy serializer for degraded audiences
+                Component degraded = LEGACY_SERIALIZER.deserialize(LEGACY_SERIALIZER.serialize(adventureMessage));
+                Audience.audience(degradedAudiences).sendMessage(Identity.nil(), degraded);
+            }
         } catch (NoClassDefFoundError e) {
             // might happen with 1.7
             if (e.getMessage().equals("org/bukkit/command/ProxiedCommandSender")) {
@@ -423,7 +441,6 @@ public class MessageUtil {
         return STRIP_SECTION_ONLY_PATTERN.matcher(text).replaceAll("");
     }
 
-
     /**
      * Translates ampersand (&) characters into section signs (§) for color codes. Ignores role mentions.
      *
@@ -438,4 +455,5 @@ public class MessageUtil {
         while (matcher.find()) stringBuilder.setCharAt(matcher.start(1), LEGACY_SECTION);
         return stringBuilder.toString();
     }
+
 }

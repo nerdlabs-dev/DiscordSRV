@@ -25,7 +25,7 @@ jobs:
       - name: Set pom version to release
         id: pom
         run: |
-          mvn -B versions:set -DremoveSnapshot
+          mvn -B versions:set -DremoveSnapshot=1
 
           JAR=$(mvn -q git-commit-id:revision help:evaluate -DforceStdout -Dexpression=project.build.finalName).jar
           echo "JAR=$JAR" >> $GITHUB_ENV

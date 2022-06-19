@@ -32,7 +32,7 @@ jobs:
       run: git rev-parse --short HEAD
     - name: Get Branch
       id: branch
-      run: echo "git_branch=git rev-parse --short HEAD" >> $GITHUB_BRANCH
+      run: echo "git_branch=git rev-parse --short HEAD"
     - name: Upload Release Asset
       id: upload-release-asset 
       uses: actions/upload-release-asset@v1

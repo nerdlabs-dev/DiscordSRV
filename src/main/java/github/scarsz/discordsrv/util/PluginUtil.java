@@ -130,25 +130,41 @@ public class PluginUtil {
      * @return Whether or not the plugin is installed and enabled
      */
     public static boolean checkIfPluginEnabled(String pluginName) {
-        Plugin plugin = getPlugin(pluginName);
-        if (plugin == null) {
-            return false;
-        } else if (plugin.isEnabled()) {
+        return checkIfPluginEnabled(pluginName, true);
+    }
+
+    /**
+     * Check whether or not the given plugin is installed and enabled
+     * @param pluginName The plugin name to check
+     * @param startsWith Whether or not to to {@link String#startsWith(String)} checking
+     * @return Whether or not the plugin is installed and enabled
+     */
+    public static boolean checkIfPluginEnabled(String pluginName, boolean startsWith) {
+        if (startsWith && checkIfPluginEnabled(pluginName, false)) {
             return true;
         }
-
-        DiscordSRV.debug("Plugin " + plugin.getName() + " found but wasn't enabled. Returning false");
+        for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+            boolean match = startsWith
+                    ? plugin.getName().toLowerCase().startsWith(pluginName.toLowerCase())
+                    : plugin.getName().equalsIgnoreCase(pluginName);
+            if (match) {
+                if (plugin.isEnabled()) {
+                    return true;
+                } else {
+                    DiscordSRV.debug("Plugin " + plugin.getName() + " found but wasn't enabled. Returning false");
+                    return false;
+                }
+            }
+        }
         return false;
     }
 
-    @SuppressWarnings("unused")
-    @Deprecated
-    public static boolean checkIfPluginEnabled(String pluginName, boolean startsWith) {
-        return checkIfPluginEnabled(pluginName);
+    public static boolean pluginHookIsEnabled(String pluginName) {
+        return pluginHookIsEnabled(pluginName, true);
     }
 
-    public static boolean pluginHookIsEnabled(String pluginName) {
-        boolean enabled = checkIfPluginEnabled(pluginName);
+    public static boolean pluginHookIsEnabled(String pluginName, boolean startsWith) {
+        boolean enabled = checkIfPluginEnabled(pluginName, startsWith);
         for (String pluginHookName : DiscordSRV.config().getStringList("DisabledPluginHooks")) {
             if (pluginName.toLowerCase().startsWith(pluginHookName.toLowerCase())) {
                 enabled = false;
@@ -158,15 +174,9 @@ public class PluginUtil {
         return enabled;
     }
 
-    @SuppressWarnings("unused")
-    @Deprecated
-    public static boolean pluginHookIsEnabled(String pluginName, boolean startsWith) {
-        return pluginHookIsEnabled(pluginName);
-    }
-
     public static Plugin getPlugin(String pluginName) {
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins())
-            if (plugin.getName().equalsIgnoreCase(pluginName)) return plugin;
+            if (plugin.getName().toLowerCase().startsWith(pluginName.toLowerCase())) return plugin;
         return null;
     }
 

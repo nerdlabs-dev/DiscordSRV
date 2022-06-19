@@ -30,6 +30,7 @@ import net.dv8tion.jda.api.entities.Role;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -63,14 +64,18 @@ public class MessageFormatResolver {
                 String hex = hexColor.get().trim();
                 if (!hex.startsWith("#")) hex = "#" + hex;
                 if (hex.length() == 7) {
-                    messageFormat.setColorRaw(
-                            Integer.valueOf(hex.substring(1, 7), 16)
+                    messageFormat.setColor(
+                            new Color(
+                                    Integer.valueOf(hex.substring(1, 3), 16),
+                                    Integer.valueOf(hex.substring(3, 5), 16),
+                                    Integer.valueOf(hex.substring(5, 7), 16)
+                            )
                     );
                 } else {
                     DiscordSRV.debug("Invalid color hex: " + hex + " (in " + key + ".Embed.Color)");
                 }
             } else {
-                config.getOptionalInt(key + ".Embed.Color").ifPresent(messageFormat::setColorRaw);
+                config.getOptionalInt(key + ".Embed.Color").map(Color::new).ifPresent(messageFormat::setColor);
             }
 
             if (config.getOptional(key + ".Embed.Author").isPresent()) {
@@ -135,9 +140,7 @@ public class MessageFormatResolver {
             }
         }
 
-        if (config.getOptional(key + ".Webhook").isPresent()
-                && config.getOptionalBoolean(key + ".Webhook.Enabled").orElse(config.getOptionalBoolean(key + ".Webhook.Enable").orElse(false))
-        ) {
+        if (config.getOptional(key + ".Webhook").isPresent() && config.getOptionalBoolean(key + ".Webhook.Enable").orElse(false)) {
             messageFormat.setUseWebhooks(true);
             config.getOptionalString(key + ".Webhook.AvatarUrl")
                     .filter(StringUtils::isNotBlank).ifPresent(messageFormat::setWebhookAvatarUrl);

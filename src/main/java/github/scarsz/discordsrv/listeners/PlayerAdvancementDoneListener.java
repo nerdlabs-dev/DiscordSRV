@@ -33,8 +33,6 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
-import org.bukkit.World;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -43,7 +41,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,40 +49,17 @@ import java.util.stream.Collectors;
 
 public class PlayerAdvancementDoneListener implements Listener {
 
-    private static final boolean GAMERULE_CLASS_AVAILABLE;
-    private static final Object GAMERULE;
-
-    static {
-        String gamerule = "announceAdvancements";
-        Object gameruleValue = null;
-        try {
-            Class<?> gameRuleClass = Class.forName("org.bukkit.GameRule");
-            gameruleValue = gameRuleClass.getMethod("getByName", String.class).invoke(null, gamerule);
-        } catch (ClassNotFoundException | NoSuchMethodException | InvocationTargetException | IllegalAccessException ignored) {}
-
-        GAMERULE_CLASS_AVAILABLE = gameruleValue != null;
-        GAMERULE = GAMERULE_CLASS_AVAILABLE ? gameruleValue : gamerule;
-    }
-
     public PlayerAdvancementDoneListener() {
         Bukkit.getPluginManager().registerEvents(this, DiscordSRV.getPlugin());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerAdvancementDone(PlayerAdvancementDoneEvent event) {
-        Player player = event.getPlayer();
         // return if advancement or player objects are knackered because this can apparently happen for some reason
-        if (event.getAdvancement() == null || event.getAdvancement().getKey().getKey().contains("recipe/") || player == null) return;
+        if (event.getAdvancement() == null || event.getAdvancement().getKey().getKey().contains("recipe/") || event.getPlayer() == null) return;
 
         // respect invisibility plugins
-        if (PlayerUtil.isVanished(player)) return;
-
-        // ensure advancements should be announced in the world
-        World world = player.getWorld();
-        Boolean isGamerule = GAMERULE_CLASS_AVAILABLE // This class was added in 1.13
-                ? world.getGameRuleValue((GameRule<Boolean>) GAMERULE) // 1.13+
-                : Boolean.parseBoolean(world.getGameRuleValue((String) GAMERULE)); // <= 1.12
-        if (Boolean.FALSE.equals(isGamerule)) return;
+        if (PlayerUtil.isVanished(event.getPlayer())) return;
 
         Bukkit.getScheduler().runTaskAsynchronously(DiscordSRV.getPlugin(), () -> runAsync(event));
     }
@@ -99,7 +73,8 @@ public class PlayerAdvancementDoneListener implements Listener {
         } catch (NullPointerException e) {
             return;
         } catch (Exception e) {
-            DiscordSRV.debug(Debug.MINECRAFT_TO_DISCORD, "Failed to check if advancement should be displayed: " + e);
+            DiscordSRV.error(e);
+            return;
         }
 
         String channelName = DiscordSRV.getPlugin().getOptionalChannel("awards");

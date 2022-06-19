@@ -171,14 +171,8 @@ public class ConfigUtil {
 
     public static void logMissingOptions() {
         for (Map.Entry<Source, Provider> entry : DiscordSRV.config().getSources().entrySet()) {
-            Set<String> keys;
-            try {
-                keys = getAllKeys(entry.getValue().getDefaults().asMap());
-                keys.removeAll(getAllKeys(entry.getValue().getValues().asMap()));
-            } catch (Throwable t) {
-                DiscordSRV.error("Failed to check " + entry.getKey().getResourceName() + " for missing options, is it broken?", t);
-                continue;
-            }
+            Set<String> keys = getAllKeys(entry.getValue().getDefaults().asMap());
+            keys.removeAll(getAllKeys(entry.getValue().getValues().asMap()));
 
             for (String missing : keys) {
                 // ignore map entries

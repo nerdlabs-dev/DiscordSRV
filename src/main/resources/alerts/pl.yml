@@ -54,7 +54,7 @@
 #    IgnoreCancelled: true # tylko dla alertów o zdarzeniach
 #    Content: ""
 #    Webhook:
-#      Enabled: false
+#      Enable: false
 #      AvatarUrl: "{botavatarurl}"
 #      Name: "{botname}"
 #    Embed:

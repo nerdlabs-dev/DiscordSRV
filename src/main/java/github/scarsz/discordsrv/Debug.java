@@ -25,8 +25,6 @@ package github.scarsz.discordsrv;
 import lombok.Getter;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 @SuppressWarnings("SpellCheckingInspection")
@@ -75,12 +73,7 @@ public enum Debug {
         if (!debuggerCategories.isEmpty() && debuggerCategories.stream().anyMatch(this::matches)) {
             return true;
         }
-
-        List<?> debug = DiscordSRV.config().getOptionalList("Debug").orElse(Collections.emptyList());
-        return debug.stream()
-                .filter(obj -> obj instanceof String)
-                .map(str -> (String) str)
-                .anyMatch(this::matches);
+        return DiscordSRV.config().getStringList("Debug").stream().anyMatch(this::matches);
     }
 
     public static boolean anyEnabled() {
